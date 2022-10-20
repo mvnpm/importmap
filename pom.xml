@@ -1,0 +1,63 @@
+<?xml version="1.0"?>
+<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>org.mvnpm</groupId>
+    <artifactId>importmap</artifactId>
+    <version>1.0.0</version>
+    
+    <name>importmap</name>
+    <description>Create an importmap from mvnpm artifacts</description>
+    <url>https://mvnpm.org/</url>
+    
+    <organization>
+        <name>mvnpm</name>
+        <url>https://mvnpm.org/</url>
+    </organization>
+    <licenses>
+        <license>
+            <name>Apache-2.0</name>
+        </license>
+    </licenses>
+    <developers>
+        <developer>
+            <name>Phillip Kruger</name>
+            <email>phillip.kruger@gmail.com</email>
+            <url>https://www.phillip-kruger.com</url>
+        </developer>
+    </developers>
+    <scm>
+        <connection>https://github.com/mvnpm/importmap</connection>
+        <developerConnection>https://github.com/mvnpm/importmap.git</developerConnection>
+        <url>https://github.com/mvnpm/importmap.git</url>
+    </scm>
+    <issueManagement>
+        <url>https://github.com/mvnpm/importmap/issues</url>
+    </issueManagement>
+    
+    <properties>
+        <maven.compiler.target>17</maven.compiler.target>
+        <maven.compiler.source>17</maven.compiler.source>
+        <compiler-plugin.version>3.8.1</compiler-plugin.version>
+        <maven.compiler.release>17</maven.compiler.release>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+    </properties>
+    
+    <dependencies>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <version>2.13.4</version>
+        </dependency>
+    </dependencies>
+    
+    <repositories>
+        <repository>
+            <id>mvnpm.org</id>
+            <name>mvnpm</name>
+            <url>https://repo.mvnpm.org/maven2</url>
+        </repository>
+    </repositories>
+    
+</project>
