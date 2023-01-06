@@ -1,5 +1,6 @@
 package org.mvnpm.importmap;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.net.URL;
@@ -16,20 +17,43 @@ import org.mvnpm.importmap.model.Imports;
 public class Aggregator {
 
     private final static ObjectMapper objectMapper = new ObjectMapper();
+    private final static Map<String, String> userProvidedImports = new HashMap<>();
+    private final static Map<String, String> discoveredImports = new HashMap<>();
     
     private Aggregator(){}
     
     public static Imports aggregate() {
         Map<String, String> allimports = new HashMap<>();
+        allimports.putAll(discoveredImports);
+        allimports.putAll(userProvidedImports);
+        return new Imports(allimports);
+    }
+    
+    public static String aggregateAsJson(){
+        try {
+            Imports i = Aggregator.aggregate();
+            return objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(i);
+        } catch (JsonProcessingException ex) {
+            throw new RuntimeException(ex);
+        }
+    }
+    
+    public static void add(String key, String value){
+        userProvidedImports.put(key, value);
+    }
+    
+    public static void add(Map<String, String> all){
+        userProvidedImports.putAll(all);
+    }
+    
+    static {
         try {
             Enumeration<URL> enumer = Thread.currentThread().getContextClassLoader().getResources(Location.IMPORTMAP_PATH);
             while (enumer.hasMoreElements()) {
                 URL importmapFile = enumer.nextElement(); 
                 Imports importForPackage = objectMapper.readValue(importmapFile, Imports.class);
-                allimports.putAll(importForPackage.imports());
+                discoveredImports.putAll(importForPackage.getImports());
             }
-            
-            return new Imports(allimports);
         } catch (IOException ex) {
             throw new RuntimeException("Could not aggregate importmaps from classpath", ex);
         }
