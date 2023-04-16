@@ -56,16 +56,28 @@ public class Aggregator {
     }
     
     public Imports aggregate() {
+        return aggregate("");
+    }
+    
+    public Imports aggregate(String root) {
+        if(root.endsWith("/")){
+            root = root.substring(0, root.length()-1);
+        }
+        
         Map<String, String> allimports = new HashMap<>();
         allimports.putAll(userProvidedImports);
-        allimports.putAll(scanUserProviderUrls());
-        allimports.putAll(scanClassPath()); // TODO: Add boolen to exclude this ?
+        allimports.putAll(scanUserProviderUrls(root));
+        allimports.putAll(scanClassPath(root)); // TODO: Add boolean to exclude this ?
         return new Imports(allimports);
     }
     
     public String aggregateAsJson(){
+        return aggregateAsJson("");
+    }
+    
+    public String aggregateAsJson(String root){
         try {
-            Imports i = aggregate();
+            Imports i = aggregate(root);
             return this.objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(i);
         } catch (JsonProcessingException ex) {
             throw new RuntimeException(ex);
@@ -77,7 +89,7 @@ public class Aggregator {
         this.userProvidedJarUrls.clear();
     }
     
-    private Map<String,String> scanUserProviderUrls(){
+    private Map<String,String> scanUserProviderUrls(String root){
         if(!userProvidedJarUrls.isEmpty()){
             URLClassLoader urlClassLoader = new URLClassLoader(userProvidedJarUrls.toArray(new URL[] {}));
             try {
@@ -85,8 +97,11 @@ public class Aggregator {
                 Map<String,String> m = new HashMap<>();
                 while (enumer.hasMoreElements()) {
                     URL importmapFile = enumer.nextElement();
-                    Imports importForPackage = objectMapper.readValue(importmapFile, Imports.class);
-                    m.putAll(importForPackage.getImports());
+                    Imports importsForPackage = objectMapper.readValue(importmapFile, Imports.class);
+                    Map<String, String> importForPackage = importsForPackage.getImports();
+                    for(Map.Entry<String, String> kv:importForPackage.entrySet()){
+                        m.put(kv.getKey(), root + kv.getValue());
+                    }
                 }
                 return m;
             }catch (IOException ex) {
@@ -96,14 +111,17 @@ public class Aggregator {
         return Map.of();
     }
     
-    private Map<String,String> scanClassPath(){
+    private Map<String,String> scanClassPath(String root){
         try {
             Enumeration<URL> enumer = Thread.currentThread().getContextClassLoader().getResources(Location.IMPORTMAP_PATH);
             Map<String,String> m = new HashMap<>();
             while (enumer.hasMoreElements()) {
                 URL importmapFile = enumer.nextElement(); 
-                Imports importForPackage = objectMapper.readValue(importmapFile, Imports.class);
-                m.putAll(importForPackage.getImports());
+                Imports importsForPackage = objectMapper.readValue(importmapFile, Imports.class);
+                Map<String, String> importForPackage = importsForPackage.getImports();
+                for(Map.Entry<String, String> kv:importForPackage.entrySet()){
+                    m.put(kv.getKey(), root + kv.getValue());
+                }
             }
             return m;
         } catch (IOException ex) {
