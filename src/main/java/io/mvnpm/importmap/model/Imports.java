@@ -1,4 +1,4 @@
-package org.mvnpm.importmap.model;
+package io.mvnpm.importmap.model;
 
 import java.util.Map;
 

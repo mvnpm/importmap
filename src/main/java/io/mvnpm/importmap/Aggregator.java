@@ -1,4 +1,4 @@
-package org.mvnpm.importmap;
+package io.mvnpm.importmap;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -11,7 +11,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import org.mvnpm.importmap.model.Imports;
+import io.mvnpm.importmap.model.Imports;
 
 /**
  * Scans the classpath and create an aggregation of all generated import maps
