@@ -56,10 +56,18 @@ public class Aggregator {
     }
     
     public Imports aggregate() {
-        return aggregate("");
+        return aggregate(true);
     }
     
-    public Imports aggregate(String root) {
+    public Imports aggregate(boolean scanClassPath) {
+        return aggregate("", scanClassPath);
+    }
+    
+    public Imports aggregate(String root){
+        return aggregate(root, true);
+    }
+    
+    public Imports aggregate(String root, boolean scanClassPath) {
         if(root.endsWith("/")){
             root = root.substring(0, root.length()-1);
         }
@@ -67,17 +75,25 @@ public class Aggregator {
         Map<String, String> allimports = new HashMap<>();
         allimports.putAll(userProvidedImports);
         allimports.putAll(scanUserProviderUrls(root));
-        allimports.putAll(scanClassPath(root)); // TODO: Add boolean to exclude this ?
+        if(scanClassPath)allimports.putAll(scanClassPath(root));
         return new Imports(allimports);
     }
     
     public String aggregateAsJson(){
-        return aggregateAsJson("");
+        return aggregateAsJson(true);
+    }
+    
+    public String aggregateAsJson(boolean scanClassPath){
+        return aggregateAsJson("", scanClassPath);
     }
     
     public String aggregateAsJson(String root){
+        return aggregateAsJson(root, true);
+    }
+    
+    public String aggregateAsJson(String root, boolean scanClassPath){
         try {
-            Imports i = aggregate(root);
+            Imports i = aggregate(root, scanClassPath);
             return this.objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(i);
         } catch (JsonProcessingException ex) {
             throw new RuntimeException(ex);
