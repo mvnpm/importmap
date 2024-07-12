@@ -100,6 +100,14 @@ public class Aggregator {
         }
     }
     
+    public String aggregateAsJson(Imports imports) {
+        try {
+            return this.objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(imports);
+        } catch (JsonProcessingException ex) {
+            throw new RuntimeException(ex);
+        }
+    }
+    
     public void reset(){
         this.userProvidedImports.clear();
         this.userProvidedJarUrls.clear();
