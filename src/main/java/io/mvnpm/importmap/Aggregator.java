@@ -3,9 +3,11 @@ package io.mvnpm.importmap;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.UncheckedIOException;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.net.URLConnection;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -120,10 +122,12 @@ public class Aggregator {
                 Map<String,String> m = new HashMap<>();
                 while (enumer.hasMoreElements()) {
                     URL importmapFile = enumer.nextElement();
-                    Imports importsForPackage = objectMapper.readValue(importmapFile, Imports.class);
-                    Map<String, String> importForPackage = importsForPackage.getImports();
-                    for(Map.Entry<String, String> kv:importForPackage.entrySet()){
-                        m.put(kv.getKey(), root + kv.getValue());
+                    try (InputStream importmapInputStream = getInputStream(importmapFile)) {
+                        Imports importsForPackage = objectMapper.readValue(importmapInputStream, Imports.class);
+                        Map<String, String> importForPackage = importsForPackage.getImports();
+                        for(Map.Entry<String, String> kv:importForPackage.entrySet()){
+                            m.put(kv.getKey(), root + kv.getValue());
+                        }
                     }
                 }
                 return m;
@@ -140,15 +144,26 @@ public class Aggregator {
             Map<String,String> m = new HashMap<>();
             while (enumer.hasMoreElements()) {
                 URL importmapFile = enumer.nextElement(); 
-                Imports importsForPackage = objectMapper.readValue(importmapFile, Imports.class);
-                Map<String, String> importForPackage = importsForPackage.getImports();
-                for(Map.Entry<String, String> kv:importForPackage.entrySet()){
-                    m.put(kv.getKey(), root + kv.getValue());
+                try (InputStream importmapInputStream = getInputStream(importmapFile)) {
+                    Imports importsForPackage = objectMapper.readValue(importmapInputStream, Imports.class);
+                    Map<String, String> importForPackage = importsForPackage.getImports();
+                    for(Map.Entry<String, String> kv:importForPackage.entrySet()){
+                        m.put(kv.getKey(), root + kv.getValue());
+                    }
                 }
             }
             return m;
         } catch (IOException ex) {
             throw new UncheckedIOException("Could not aggregate importmaps from classpath", ex);
         }
+    }
+    
+    /**
+     * Using setUseCaches(false) makes sure we don't keep the jar files opened after closing them.
+     */
+    private static InputStream getInputStream(URL importmapFile) throws IOException {
+        URLConnection importmapURLConnection = importmapFile.openConnection();
+        importmapURLConnection.setUseCaches(false);
+        return importmapURLConnection.getInputStream();
     }
 }
