@@ -107,8 +107,7 @@ public class Aggregator {
     
     private Map<String,String> scanUserProviderUrls(String root){
         if(!userProvidedJarUrls.isEmpty()){
-            URLClassLoader urlClassLoader = new URLClassLoader(userProvidedJarUrls.toArray(new URL[] {}));
-            try {
+            try (URLClassLoader urlClassLoader = new URLClassLoader(userProvidedJarUrls.toArray(new URL[] {}))) {
                 Enumeration<URL> enumer = urlClassLoader.getResources(Location.IMPORTMAP_PATH);
                 Map<String,String> m = new HashMap<>();
                 while (enumer.hasMoreElements()) {
