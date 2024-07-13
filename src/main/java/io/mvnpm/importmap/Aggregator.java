@@ -14,11 +14,13 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import io.mvnpm.importmap.model.Imports;
+import java.io.StringWriter;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Scans the classpath and create an aggregation of all generated import maps
  * @author Phillip Kruger (phillip.kruger@gmail.com)
- * TODO: Add support for use supplied import map to be merged in
  */
 public class Aggregator {
 
@@ -85,12 +87,24 @@ public class Aggregator {
         return aggregateAsJson(true);
     }
     
+    public String aggregateAsJs(){
+        return aggregateAsJs(true);
+    }
+    
     public String aggregateAsJson(boolean scanClassPath){
         return aggregateAsJson("", scanClassPath);
     }
     
+    public String aggregateAsJs(boolean scanClassPath){
+        return aggregateAsJs("", scanClassPath);
+    }
+    
     public String aggregateAsJson(String root){
         return aggregateAsJson(root, true);
+    }
+    
+    public String aggregateAsJs(String root){
+        return aggregateAsJs(root, true);
     }
     
     public String aggregateAsJson(String root, boolean scanClassPath){
@@ -107,6 +121,23 @@ public class Aggregator {
             return this.objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(imports);
         } catch (JsonProcessingException ex) {
             throw new RuntimeException(ex);
+        }
+    }
+    
+    public String aggregateAsJs(String root, boolean scanClassPath){
+        
+        Imports i = aggregate(root, scanClassPath);
+        Map<String, String> imports = i.getImports();
+
+        try(StringWriter sw = new StringWriter()){
+            
+            for(Map.Entry<String, String> e:imports.entrySet()){
+                sw.write("import '" + e.getValue() + "';");
+                sw.write("\n");
+            }
+            return sw.toString();
+        } catch (IOException ex) {
+            throw new UncheckedIOException(ex);
         }
     }
     
