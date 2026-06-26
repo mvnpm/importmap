@@ -1,7 +1,7 @@
 package io.mvnpm.importmap;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UncheckedIOException;
@@ -111,7 +111,7 @@ public class Aggregator {
         try {
             Imports i = aggregate(root, scanClassPath);
             return this.objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(i);
-        } catch (JsonProcessingException ex) {
+        } catch (JacksonException ex) {
             throw new RuntimeException(ex);
         }
     }
@@ -119,7 +119,7 @@ public class Aggregator {
     public String aggregateAsJson(Imports imports) {
         try {
             return this.objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(imports);
-        } catch (JsonProcessingException ex) {
+        } catch (JacksonException ex) {
             throw new RuntimeException(ex);
         }
     }
