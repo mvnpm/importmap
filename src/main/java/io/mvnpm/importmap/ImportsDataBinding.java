@@ -1,7 +1,7 @@
 package io.mvnpm.importmap;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.ObjectMapper;
 import io.mvnpm.importmap.model.Imports;
 
 /**
@@ -17,7 +17,7 @@ public class ImportsDataBinding {
     public static Imports toImports(String json) {
         try {
             return objectMapper.readValue(json, Imports.class);
-        } catch (JsonProcessingException ex) {
+        } catch (JacksonException ex) {
             throw new RuntimeException("Error while binding to Imports Object. Json = [" + json + "]", ex);
         }
     }
@@ -25,7 +25,7 @@ public class ImportsDataBinding {
     public static String toJson(Imports imports){
         try {
             return objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(imports);
-        } catch (JsonProcessingException ex) {
+        } catch (JacksonException ex) {
             throw new RuntimeException("Error while binding to Json. Imports Object = [" + imports + "]", ex);
         }
     }
