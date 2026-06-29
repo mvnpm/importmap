@@ -102,7 +102,7 @@
         <dependency>
             <groupId>org.mvnpm</groupId>
             <artifactId>lit</artifactId>
-            <version>3.1.4</version>
+            <version>3.3.3</version>
             <scope>test</scope>
         </dependency>
         <dependency>
